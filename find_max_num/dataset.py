@@ -21,3 +21,10 @@ def generate_random_datas(total, size):
     x_array = np.array(x)
     y_array = np.array(y)
     return torch.FloatTensor(x_array), torch.LongTensor(y_array)  
+
+
+if __name__ == '__main__':
+    x, y = generate_random_datas(5, 5)
+    zip_data = zip(x, y)
+    for _x, _y in zip_data:
+        print(_x, _y)
