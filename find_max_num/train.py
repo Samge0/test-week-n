@@ -11,7 +11,7 @@ import dataset
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # 模型输出目录
-MODEL_DIR = os.path.join(CURRENT_DIR, "models_ouput")
+MODEL_DIR = os.path.join(CURRENT_DIR, "models_output")
 os.makedirs(MODEL_DIR, exist_ok=True)
 
 # best模型保存路径

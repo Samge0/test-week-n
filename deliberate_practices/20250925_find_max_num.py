@@ -24,7 +24,7 @@ import matplotlib.pyplot as plt
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # 模型保存路径
-MODEL_SAVE_PATH = f"{CURRENT_DIR}/models_ouput/model_20250925.pth"
+MODEL_SAVE_PATH = f"{CURRENT_DIR}/models_output/model_20250925.pth"
 
 # 构建模型
 class Net(nn.Module):
