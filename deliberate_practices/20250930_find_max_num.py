@@ -12,16 +12,30 @@
 """
 
 import os
+import time
 import math
 import torch
-import torch.nn as nn
+import swanlab
 import numpy as np
+import torch.nn as nn
 import matplotlib.pyplot as plt
+
+# 训练配置
+train_config = {
+  "input_size": 5,
+  "epochs": 200,
+  "batch_size": 20,
+  "batch_total": 1000,
+  "learning_rate": 0.001,
+  "architecture": "TORCH SIMPLE",
+  "dataset": "CUSTOM_GENERATED",
+  "current_date": "20250930",
+}
 
 # 当前目录
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 # 模型目录
-MODEL_PATH = os.path.join(CURRENT_DIR, 'models_output/model_20250930.pth')
+MODEL_PATH = os.path.join(CURRENT_DIR, f'models_output/model_{train_config["current_date"]}.pth')
 
 class Net(nn.Module):
     
@@ -55,24 +69,34 @@ def evaluate(model, input_size, total=500):
 
 # 训练函数
 def train():
-    input_size = 5
-    epoch_total = 200
-    batch_size = 20
-    batch_total = 1000
-    lr = 0.001
+    input_size = int(train_config.get("input_size", 1))
+    epochs = int(train_config.get("epochs", 1))
+    batch_size = int(train_config.get("batch_size", 1))
+    batch_total = int(train_config.get("batch_total", 0))
+    learning_rate = float(train_config.get("learning_rate", 0.001))
     batch_max = math.ceil(batch_total / batch_size)
+    current_date = train_config.get("current_date", "")
+    
+    # 初始化swanlab
+    swanlab.init(
+        workspace="samge",
+        project="test-week-n",
+        experiment_name=f"find_max_num-{current_date}-{int(time.time())}",
+        tags=["test", "deliberate_practice", "find_max_num", current_date],
+        config=train_config,
+    )
     
     # 训练数据
     train_x_lst, train_y_lst = generate_datas(input_size, batch_total)
     
     # 模型 + 优化器
     model = Net(input_size)
-    optim = torch.optim.Adam(model.parameters(), lr=lr)
+    optim = torch.optim.Adam(model.parameters(), lr=learning_rate)
     
     # 收集训练数据
     train_logs = []
     
-    for epoch in range(epoch_total):
+    for epoch in range(epochs):
         model.train()
         
         # 每次都打乱数据集
@@ -102,13 +126,20 @@ def train():
         # 求准确率
         acc = evaluate(model, input_size)
         
+        # 记录本地日志
         train_logs.append([acc, mean_loss])
-        print(f'epoch: [{epoch+1}/{epoch_total}], loss: {mean_loss}, acc: {acc}')
+        print(f'epoch: [{epoch+1}/{epochs}], loss: {mean_loss}, acc: {acc}')
+        
+        # 向swanlab上传训练指标
+        swanlab.log({"acc": acc, "loss": mean_loss})
         
         # 保存模型
         torch.save(model.state_dict(), MODEL_PATH)
-        
-    # 显示训练日志图
+    
+    # 完成swanlab日志上传
+    swanlab.finish()    
+    
+    # 显示本地训练日志图
     plt_x_lst = range(len(train_logs))
     plt.plot(plt_x_lst, [l[0] for l in train_logs], label='acc')
     plt.plot(plt_x_lst, [l[1] for l in train_logs], label='loss')
@@ -126,7 +157,7 @@ if __name__ == '__main__':
         
     # 训练
     train()
-    
+
     # 使用训练好的模型
     # model = Net(input_size)
     # model.load_state_dict(torch.load(MODEL_PATH))

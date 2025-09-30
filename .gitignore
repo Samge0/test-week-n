@@ -144,3 +144,4 @@ test*.py
 *.pt
 models_output/
 tests/
+swanlog/
