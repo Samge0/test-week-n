@@ -20,18 +20,17 @@ import matplotlib.pyplot as plt
 # 当前目录
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 # 模型路径
-MODEL_PATH = os.path.join(CURRENT_DIR, 'models_output/model_20251023.pth')
+MODEL_PATH = os.path.join(CURRENT_DIR, 'models_output/model_20251024.pth')
 
 # 训练配置
 train_config = {
-    "input_size": 15,
-    "epochs": 400,
-    "batch_size": 100,
-    "batch_total": 12000,
+    "input_size": 16,
+    "epochs": 200,
+    "batch_size": 60,
+    "batch_total": 20000,
     "lr": 0.001,
-    "current_date": "20251023"
+    "current_date": "20251024"
 }
-
 
 class Net(nn.Module):
     def __init__(self, input_size):
@@ -56,6 +55,7 @@ def evaluate(model, input_size, total=500):
         return (y_perd.argmax(dim=1) == y).sum().item() / total
     
 def train():
+    
     input_size = train_config["input_size"]
     epochs = train_config["epochs"]
     batch_size = train_config["batch_size"]
@@ -99,7 +99,7 @@ def train():
             optim.step()
             
             loss_logs.append(loss.item())
-        
+            
         acc = evaluate(model, input_size)
         mean_loss = np.mean(loss_logs)
         train_logs.append([acc, mean_loss])
@@ -109,8 +109,8 @@ def train():
         torch.save(model.state_dict(), MODEL_PATH)
         
     swanlab.finish()
-    plt.plot(np.array(train_logs)[:, 0], label="acc")
-    plt.plot(np.array(train_logs)[:, 1], label="loss")
+    plt.plot(np.array(train_logs)[:,0], label="acc")
+    plt.plot(np.array(train_logs)[:,1], label="loss")
     plt.legend()
     plt.show()
     
@@ -122,3 +122,4 @@ if __name__ == "__main__":
     model = Net(input_size)
     model.load_state_dict(torch.load(MODEL_PATH))
     print(f"acc: {evaluate(model, input_size)}")
+
