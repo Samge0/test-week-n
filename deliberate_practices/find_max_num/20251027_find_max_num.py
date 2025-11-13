@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 =*-
+# -*- coding: utf-8 -*-
 
 """
 练习：找出一个数组中的最大值的下标
