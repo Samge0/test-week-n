@@ -1,6 +1,6 @@
 torch==2.8.0
 numpy==2.2.6
 matplotlib==3.10.5
-swanlab==0.7.1
+swanlab==0.7.3
 python-dotenv==1.0.1
 nvidia-ml-py==13.580.82
